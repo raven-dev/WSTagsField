@@ -45,6 +45,10 @@ open class WSTagsField: UIScrollView {
     open var tagVerticalPadding: CGFloat? {
         didSet { tagViews.forEach { $0.verticalPadding = self.tagVerticalPadding } }
     }
+    
+    open var tagCornerRadius: CGFloat? {
+        didSet { tagViews.forEach { $0.cornerRadius = self.tagCornerRadius } }
+    }
 
     open var delimiter: String = "" {
         didSet { tagViews.forEach { $0.displayDelimiter = self.displayDelimiter ? self.delimiter : "" } }
