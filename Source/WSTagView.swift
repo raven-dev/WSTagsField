@@ -82,7 +82,9 @@ open class WSTagView: UIView {
         selectedColor = .gray
         selectedTextColor = .black
 
-        textLabel.frame = CGRect(x: Constants.TagViewXPadding, y: Constants.TagViewYPadding, width: 0, height: 0)
+        let hPadding = horizontalPadding ?? Constants.TagViewXPadding
+        let vPadding = verticalPadding ?? Constants.TagViewYPadding
+        textLabel.frame = CGRect(x: hPadding, y: vPadding, width: 0, height: 0)
         textLabel.font = font
         textLabel.textColor = .white
         textLabel.backgroundColor = .clear
@@ -131,16 +133,20 @@ open class WSTagView: UIView {
     // MARK: - Size Measurements
     open override var intrinsicContentSize: CGSize {
         let labelIntrinsicSize = textLabel.intrinsicContentSize
-        return CGSize(width: labelIntrinsicSize.width + 2 * Constants.TagViewXPadding,
-                      height: labelIntrinsicSize.height + 2 * Constants.TagViewYPadding)
+        let hPadding = horizontalPadding ?? Constants.TagViewXPadding
+        let vPadding = verticalPadding ?? Constants.TagViewYPadding
+        return CGSize(width: labelIntrinsicSize.width + 2 * hPadding,
+                      height: labelIntrinsicSize.height + 2 * vPadding)
     }
 
     open override func sizeThatFits(_ size: CGSize) -> CGSize {
-        let fittingSize = CGSize(width: size.width - 2.0 * Constants.TagViewXPadding,
-                                 height: size.height - 2.0 * Constants.TagViewYPadding)
+        let hPadding = horizontalPadding ?? Constants.TagViewXPadding
+        let vPadding = verticalPadding ?? Constants.TagViewYPadding
+        let fittingSize = CGSize(width: size.width - 2.0 * hPadding,
+                                 height: size.height - 2.0 * vPadding)
         let labelSize = textLabel.sizeThatFits(fittingSize)
-        return CGSize(width: labelSize.width + 2.0 * Constants.TagViewXPadding,
-                      height: labelSize.height + 2.0 * Constants.TagViewYPadding)
+        return CGSize(width: labelSize.width + 2.0 * hPadding,
+                      height: labelSize.height + 2.0 * vPadding)
     }
 
     open func sizeToFit(_ size: CGSize) -> CGSize {
@@ -164,7 +170,10 @@ open class WSTagView: UIView {
     // MARK: - Laying out
     open override func layoutSubviews() {
         super.layoutSubviews()
-        textLabel.frame = bounds.insetBy(dx: horizontalPadding ?? Constants.TagViewXPadding, dy: verticalPadding ??  Constants.TagViewYPadding)
+        
+        let hPadding = horizontalPadding ?? Constants.TagViewXPadding
+        let vPadding = verticalPadding ?? Constants.TagViewYPadding
+        textLabel.frame = bounds.insetBy(dx: hPadding, dy: vPadding)
         if frame.width == 0 || frame.height == 0 {
             frame.size = self.intrinsicContentSize
         }
