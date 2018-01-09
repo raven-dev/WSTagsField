@@ -427,7 +427,7 @@ extension WSTagsField {
 
         textField.addTarget(self, action: #selector(onTextFieldDidChange(_:)), for: .editingChanged)
 
-        intrinsicContentHeight = tagViewWithValue(" ").intrinsicContentSize.height
+        intrinsicContentHeight = tagViewWithValue(WSTag(" ")).intrinsicContentSize.height
         repositionViews()
     }
 
@@ -437,8 +437,8 @@ extension WSTagsField {
         var curX: CGFloat = padding.left
         var curY: CGFloat = padding.top
         // tagView added with space for height calculation
-        var tagHeight: CGFloat = tagViews.first?.intrinsicContentSize.height ?? tagViewWithValue(" ").intrinsicContentSize.height
-        var totalHeight: CGFloat = tagViews.first?.intrinsicContentSize.height ?? tagViewWithValue(" ").intrinsicContentSize.height
+        var tagHeight: CGFloat = tagViews.first?.intrinsicContentSize.height ?? tagViewWithValue(WSTag(" ")).intrinsicContentSize.height
+        var totalHeight: CGFloat = tagViews.first?.intrinsicContentSize.height ?? tagViewWithValue(WSTag(" ")).intrinsicContentSize.height
         var isOnFirstLine = true
 
         // Position Tag views
