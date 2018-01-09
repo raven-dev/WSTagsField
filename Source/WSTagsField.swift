@@ -9,7 +9,7 @@
 import UIKit
 
 open class WSTagsField: UIScrollView {
-    let textField = BackspaceDetectingTextField()
+    open let textField = BackspaceDetectingTextField()
 
     open override var isFirstResponder: Bool {
         guard super.isFirstResponder == false,
@@ -36,6 +36,14 @@ open class WSTagsField: UIScrollView {
 
     open var selectedTextColor: UIColor? {
         didSet { tagViews.forEach { $0.selectedTextColor = self.selectedTextColor } }
+    }
+    
+    open var tagHorizontalPadding: CGFloat? {
+        didSet { tagViews.forEach { $0.horizontalPadding = self.tagHorizontalPadding } }
+    }
+    
+    open var tagVerticalPadding: CGFloat? {
+        didSet { tagViews.forEach { $0.verticalPadding = self.tagVerticalPadding } }
     }
 
     open var delimiter: String = "" {
@@ -197,6 +205,8 @@ open class WSTagsField: UIScrollView {
         tagView.textColor = self.textColor
         tagView.selectedColor = self.selectedColor
         tagView.selectedTextColor = self.selectedTextColor
+        tagView.horizontalPadding = self.tagHorizontalPadding
+        tagView.verticalPadding = self.tagVerticalPadding
         tagView.displayDelimiter = self.displayDelimiter ? self.delimiter : ""
 
         tagView.onDidRequestSelection = { [weak self] tagView in

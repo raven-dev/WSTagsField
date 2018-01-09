@@ -9,7 +9,7 @@
 import UIKit
 
 open class WSTagView: UIView {
-    fileprivate let textLabel = UILabel()
+    open let textLabel = UILabel()
 
     open var displayText: String = "" {
         didSet {
@@ -46,6 +46,14 @@ open class WSTagView: UIView {
 
     open var selectedTextColor: UIColor? {
         didSet { updateContent(animated: false) }
+    }
+    
+    open var horizontalPadding: CGFloat? {
+        didSet { layoutSubviews() }
+    }
+    
+    open var verticalPadding: CGFloat? {
+        didSet { layoutSubviews() }
     }
 
     internal var onDidRequestDelete: ((_ tagView: WSTagView, _ replacementText: String?) -> Void)?
@@ -156,7 +164,7 @@ open class WSTagView: UIView {
     // MARK: - Laying out
     open override func layoutSubviews() {
         super.layoutSubviews()
-        textLabel.frame = bounds.insetBy(dx: Constants.TagViewXPadding, dy: Constants.TagViewYPadding)
+        textLabel.frame = bounds.insetBy(dx: horizontalPadding ?? Constants.TagViewXPadding, dy: verticalPadding ??  Constants.TagViewYPadding)
         if frame.width == 0 || frame.height == 0 {
             frame.size = self.intrinsicContentSize
         }
