@@ -55,6 +55,10 @@ open class WSTagView: UIView {
     open var verticalPadding: CGFloat? {
         didSet { layoutSubviews() }
     }
+    
+    open var cornerRadius: CGFloat? {
+        didSet { layoutSubviews() }
+    }
 
     internal var onDidRequestDelete: ((_ tagView: WSTagView, _ replacementText: String?) -> Void)?
     internal var onDidRequestSelection: ((_ tagView: WSTagView) -> Void)?
@@ -171,6 +175,7 @@ open class WSTagView: UIView {
     open override func layoutSubviews() {
         super.layoutSubviews()
         
+        self.layer.cornerRadius = self.cornerRadius ?? 3.0
         let hPadding = horizontalPadding ?? Constants.TagViewXPadding
         let vPadding = verticalPadding ?? Constants.TagViewYPadding
         textLabel.frame = bounds.insetBy(dx: hPadding, dy: vPadding)
