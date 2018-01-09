@@ -88,7 +88,11 @@ open class WSTagsField: UIScrollView {
         didSet { repositionViews() }
     }
 
-    open var spaceBetweenTags: CGFloat = 2.0 {
+    open var horizontalSpaceBetweenTags: CGFloat = 2.0 {
+        didSet { repositionViews() }
+    }
+    
+    open var vertialSpaceBetweenTags: CGFloat = 4.0 {
         didSet { repositionViews() }
     }
 
@@ -198,42 +202,7 @@ open class WSTagsField: UIScrollView {
         if self.tags.contains(tag) { return }
 
         self.tags.append(tag)
-
-        let tagView = WSTagView(tag: tag)
-        tagView.font = self.font
-        tagView.tintColor = self.tintColor
-        tagView.textColor = self.textColor
-        tagView.selectedColor = self.selectedColor
-        tagView.selectedTextColor = self.selectedTextColor
-        tagView.horizontalPadding = self.tagHorizontalPadding
-        tagView.verticalPadding = self.tagVerticalPadding
-        tagView.displayDelimiter = self.displayDelimiter ? self.delimiter : ""
-
-        tagView.onDidRequestSelection = { [weak self] tagView in
-            self?.selectTagView(tagView, animated: true)
-        }
-
-        tagView.onDidRequestDelete = { [weak self] tagView, replacementText in
-            // First, refocus the text field
-            self?.textField.becomeFirstResponder()
-            if (replacementText?.isEmpty ?? false) == false {
-                self?.textField.text = replacementText
-            }
-            // Then remove the view from our data
-            if let index = self?.tagViews.index(of: tagView) {
-                self?.removeTagAtIndex(index)
-            }
-        }
-
-        tagView.onDidInputText = { [weak self] tagView, text in
-            if text == "\n" {
-                self?.selectNextTag()
-            } else {
-                self?.textField.becomeFirstResponder()
-                self?.textField.text = text
-            }
-        }
-
+        let tagView = tagViewWithValue(tag)
         self.tagViews.append(tagView)
         addSubview(tagView)
 
@@ -245,6 +214,44 @@ open class WSTagsField: UIScrollView {
 
         updatePlaceholderTextVisibility()
         repositionViews()
+    }
+    
+    fileprivate func tagViewWithValue(_ tag: WSTag) -> WSTagView {
+        let tagView = WSTagView(tag: tag)
+        tagView.font = self.font
+        tagView.tintColor = self.tintColor
+        tagView.textColor = self.textColor
+        tagView.selectedColor = self.selectedColor
+        tagView.selectedTextColor = self.selectedTextColor
+        tagView.horizontalPadding = self.tagHorizontalPadding
+        tagView.verticalPadding = self.tagVerticalPadding
+        tagView.displayDelimiter = self.displayDelimiter ? self.delimiter : ""
+        
+        tagView.onDidRequestSelection = { [weak self] tagView in
+            self?.selectTagView(tagView, animated: true)
+        }
+        
+        tagView.onDidRequestDelete = { [weak self] tagView, replacementText in
+            // First, refocus the text field
+            self?.textField.becomeFirstResponder()
+            if (replacementText?.isEmpty ?? false) == false {
+                self?.textField.text = replacementText
+            }
+            // Then remove the view from our data
+            if let index = self?.tagViews.index(of: tagView) {
+                self?.removeTagAtIndex(index)
+            }
+        }
+        
+        tagView.onDidInputText = { [weak self] tagView, text in
+            if text == "\n" {
+                self?.selectNextTag()
+            } else {
+                self?.textField.becomeFirstResponder()
+                self?.textField.text = text
+            }
+        }
+        return tagView
     }
 
     open func removeTag(_ tag: String) {
@@ -420,7 +427,7 @@ extension WSTagsField {
 
         textField.addTarget(self, action: #selector(onTextFieldDidChange(_:)), for: .editingChanged)
 
-        intrinsicContentHeight = Constants.STANDARD_ROW_HEIGHT
+        intrinsicContentHeight = tagViewWithValue(" ").intrinsicContentSize.height
         repositionViews()
     }
 
@@ -429,7 +436,9 @@ extension WSTagsField {
         let firstLineRightBoundary: CGFloat = rightBoundary
         var curX: CGFloat = padding.left
         var curY: CGFloat = padding.top
-        var totalHeight: CGFloat = Constants.STANDARD_ROW_HEIGHT
+        // tagView added with space for height calculation
+        var tagHeight: CGFloat = tagViews.first?.intrinsicContentSize.height ?? tagViewWithValue(" ").intrinsicContentSize.height
+        var totalHeight: CGFloat = tagViews.first?.intrinsicContentSize.height ?? tagViewWithValue(" ").intrinsicContentSize.height
         var isOnFirstLine = true
 
         // Position Tag views
@@ -440,29 +449,30 @@ extension WSTagsField {
             let tagBoundary = isOnFirstLine ? firstLineRightBoundary : rightBoundary
             if curX + tagRect.width > tagBoundary {
                 // Need a new line
+                let rowHeight = tagView.intrinsicContentSize.height + self.vertialSpaceBetweenTags
                 curX = padding.left
-                curY += Constants.STANDARD_ROW_HEIGHT + Constants.VSPACE
-                totalHeight += Constants.STANDARD_ROW_HEIGHT
+                curY += rowHeight
+                totalHeight += tagHeight
                 isOnFirstLine = false
             }
 
             tagRect.origin.x = curX
             // Center our tagView vertically within STANDARD_ROW_HEIGHT
-            tagRect.origin.y = curY + ((Constants.STANDARD_ROW_HEIGHT - tagRect.height)/2.0)
+            tagRect.origin.y = curY + ((tagHeight - tagRect.height)/2.0)
             tagView.frame = tagRect
             tagView.setNeedsLayout()
 
-            curX = tagRect.maxX + self.spaceBetweenTags
+            curX = tagRect.maxX + self.horizontalSpaceBetweenTags
         }
 
         // Always indent TextField by a little bit
-        curX += max(0, Constants.TEXT_FIELD_HSPACE - self.spaceBetweenTags)
+        curX += max(0, Constants.TEXT_FIELD_HSPACE - self.horizontalSpaceBetweenTags)
         let textBoundary: CGFloat = isOnFirstLine ? firstLineRightBoundary : rightBoundary
         var availableWidthForTextField: CGFloat = textBoundary - curX
       
         if textField.isEnabled {
           var textFieldRect = CGRect.zero
-          textFieldRect.size.height = Constants.STANDARD_ROW_HEIGHT
+          textFieldRect.size.height = tagHeight
           
           if availableWidthForTextField < Constants.MINIMUM_TEXTFIELD_WIDTH {
             isOnFirstLine = false
@@ -470,8 +480,8 @@ extension WSTagsField {
             // isOnFirstLine will be useful, and this calculation is important.
             // So leaving it set here, and marking the warning to ignore it
             curX = padding.left + Constants.TEXT_FIELD_HSPACE
-            curY += Constants.STANDARD_ROW_HEIGHT + Constants.VSPACE
-            totalHeight += Constants.STANDARD_ROW_HEIGHT
+            curY += tagHeight + self.vertialSpaceBetweenTags
+            totalHeight += tagHeight
             // Adjust the width
             availableWidthForTextField = rightBoundary - curX
           }
@@ -486,7 +496,7 @@ extension WSTagsField {
         }
 
         let oldContentHeight: CGFloat = self.intrinsicContentHeight
-        intrinsicContentHeight = max(totalHeight, curY + Constants.STANDARD_ROW_HEIGHT + Constants.VSPACE + padding.bottom)
+        intrinsicContentHeight = max(totalHeight, curY + tagHeight + self.vertialSpaceBetweenTags + padding.bottom)
         invalidateIntrinsicContentSize()
 
         if oldContentHeight != self.intrinsicContentHeight {
