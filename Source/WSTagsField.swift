@@ -65,6 +65,7 @@ open class WSTagsField: UIScrollView {
     open var placeholder: String = "Tags" {
         didSet { updatePlaceholderTextVisibility() }
     }
+    
     open var placeholderAlwayVisible: Bool = false {
         didSet { updatePlaceholderTextVisibility() }
     }
@@ -437,7 +438,7 @@ extension WSTagsField {
         var curX: CGFloat = padding.left
         var curY: CGFloat = padding.top
         // tagView added with space for height calculation
-        var tagHeight: CGFloat = tagViews.first?.intrinsicContentSize.height ?? tagViewWithValue(WSTag(" ")).intrinsicContentSize.height
+        let tagHeight: CGFloat = tagViews.first?.intrinsicContentSize.height ?? tagViewWithValue(WSTag(" ")).intrinsicContentSize.height
         var totalHeight: CGFloat = tagViews.first?.intrinsicContentSize.height ?? tagViewWithValue(WSTag(" ")).intrinsicContentSize.height
         var isOnFirstLine = true
 
@@ -496,7 +497,7 @@ extension WSTagsField {
         }
 
         let oldContentHeight: CGFloat = self.intrinsicContentHeight
-        intrinsicContentHeight = max(totalHeight, curY + tagHeight + self.vertialSpaceBetweenTags + padding.bottom)
+        intrinsicContentHeight = max(totalHeight, curY + tagHeight + padding.bottom)
         invalidateIntrinsicContentSize()
 
         if oldContentHeight != self.intrinsicContentHeight {
