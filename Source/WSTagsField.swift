@@ -70,6 +70,10 @@ open class WSTagsField: UIScrollView {
         didSet { updatePlaceholderTextVisibility() }
     }
     
+    open var placeholderTextColor: UIColor = UIColor.black {
+        didSet { updatePlaceholderTextVisibility() }
+    }
+    
     open var placeholderAlwayVisible: Bool = false {
         didSet { updatePlaceholderTextVisibility() }
     }
@@ -532,7 +536,7 @@ extension WSTagsField {
     fileprivate func updatePlaceholderTextVisibility() {
         textField.placeholder = tags.count > 0 ? nil : placeholder
         if placeholderAlwayVisible {
-            textField.placeholder = placeholder
+            textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [NSAttributedStringKey.foregroundColor: placeholderTextColor])
         }
     }
 }
