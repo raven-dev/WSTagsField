@@ -534,9 +534,10 @@ extension WSTagsField {
     }
 
     fileprivate func updatePlaceholderTextVisibility() {
-        textField.placeholder = tags.count > 0 ? nil : placeholder
+        let placeholderText = NSAttributedString(string: placeholder, attributes: [NSForegroundColorAttributeName: placeholderTextColor])
+        textField.attributedPlaceholder = tags.count > 0 ? nil : placeholderText
         if placeholderAlwayVisible {
-            textField.attributedPlaceholder = NSAttributedString(string: placeholder, attributes: [NSForegroundColorAttributeName: placeholderTextColor])
+            textField.attributedPlaceholder = placeholderText
         }
     }
 }
